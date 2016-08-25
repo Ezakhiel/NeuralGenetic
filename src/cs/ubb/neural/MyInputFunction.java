@@ -11,7 +11,6 @@ public class MyInputFunction extends InputFunction{
 	    for (Connection connection : inputConnections) {
 	    	output += connection.getWeightedInput();
 	    	}
-	    
 	    return output / inputConnections.length;
 	}
 

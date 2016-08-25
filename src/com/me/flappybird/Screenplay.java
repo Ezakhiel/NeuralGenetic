@@ -26,59 +26,69 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.SnapshotArray;
 
 import cs.ubb.Genetic.GeneticLearn;
+import net.sf.javaml.utils.ArrayUtils;
 
 public class Screenplay implements Screen {
 
 	private TextureAtlas Atlas;
 	private Stage stage;
-	public AiBird bird;
+	public AiBird[] birds;
 	public static Land land;
 	public static Label labelScore;
 	private float duraTimepipe;
 	private float check; //check when to make map
 	Array<Actor> allActors;
 	public ArrayList screen;
-	double[][] data = new double[config.dataHeigth][config.dataWidth];
+	double[][][] data ;
 	GeneticLearn gLearn;
+	public int population;
+	public static boolean allDead;
 
 	public Screenplay(Flappybird game, GeneticLearn gL) {
 		stage = new Stage();
 		game.manager.load("data/flappy.txt", TextureAtlas.class);
 		game.manager.finishLoading();
 		Atlas = game.manager.get("data/flappy.txt", TextureAtlas.class);
-		TextureRegion[] birdRegions = new TextureRegion[] {
-				Atlas.findRegion("bird1"), Atlas.findRegion("bird2"),
-				Atlas.findRegion("bird3") };
-		gLearn = gL;
+		gLearn = gL;population = gL.geneticDTO.population;
+		data = new double[population][config.dataHeigth][config.dataWidth];
+		birds = new AiBird[population];
 	}
 
 	private void clearData(){
-		for (double[] row : data)
-			Arrays.fill(row, 0);
+		for (double[][] map : data)
+			for (double[] row : map)
+				Arrays.fill(row, 0);
 	}
 
 	private void printMap(){
-		for (double[] row : data){
+		for (double[][] map : data)
+			for (double[] row : map)
 			System.out.println(Arrays.toString(row));
+	}
+	
+	public boolean hasAliveBird(){
+		for (AiBird aiBird : birds){
+			if (!aiBird.isDie)
+				return true;
 		}
-		System.out.println("==========================================================================");
+		return false;
 	}
 
 	@Override
 	public void render(float delta) { // fps renderer
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
 		//my stuff
-		//how often to get data
-		if ((((int)bird.score % config.makeMapTimer) == 0) && !bird.isDie){
+		if ((( ((int)delta) % config.makeMapTimer) == 0) && hasAliveBird()){
 			clearData();
 			allActors = stage.getActors();
 			for (Actor actor : allActors){
 				switch (actor.getName()){
 					case "bird":
 						//System.out.println("Bird at:"+ actor.getX() +": " + actor.getY());
-						data[getDataYLocation(actor.getY())][getDataXLocation(actor.getX())] = 3;
+						data[((AiBird)actor).id]
+							[getDataYLocation(actor.getY())]
+							[getDataXLocation(actor.getX())] = 3;
 						break;
 						
 					case "Pipe2":
@@ -87,9 +97,11 @@ public class Screenplay implements Screen {
 						int tmpYLoc = Math.abs(getDataYLocation(actor.getY()));
 						for (int i=0; i<config.dataHeigth; i++){
 							if (i == tmpYLoc+1 || i == tmpYLoc+2)
-								data[i][tmpXLoc] = 0;
+								for (double[][] map : data)
+									map[i][tmpXLoc] = 0;
 							else
-								data[i][tmpXLoc] = 1;
+								for (double[][] map : data)
+									map[i][tmpXLoc] = 1;
 						}
 						//data[getDataYLocation(actor.getY())][getDataXLocation(actor.getX())] = 1;
 						break;
@@ -97,45 +109,39 @@ public class Screenplay implements Screen {
 			}
 			//printMap();
 		}
+		//how often to get data
 		 //print data
-		if (gLearn.decision(0, data)){
-			if (bird.isDie) {
-				resetGame();
-			} else {
-				bird.Tapme();
-				//Flappybird.Sounds.get(config.SoundsJump).play();
-			}
-		}
-		else{
-			System.out.println("Dont Jump");
-		}
-
-		if (Gdx.input.justTouched()) {
-			if (bird.isDie) {
-				resetGame();
-			} else {
-				bird.Tapme();
-				//Flappybird.Sounds.get(config.SoundsJump).play();
-			}
-		}
 		duraTimepipe += delta;
-		bird.updateScore((int)Math.ceil(delta)); // FITNESS = time alive
-
+		for (AiBird bird : birds){
+			if (!bird.isDie){
+				allDead = false;
+				if (gLearn.decision(0, data[bird.id])){
+						//bird.Tapme();
+				}
+				// FITNESS = time alive
+				bird.updateScore((int)Math.ceil(delta));
+			}
+			if (!bird.TapPipe)
+				 bird.TapPipe = true;
+		}
+		if (allDead) {
+			resetGame();
+		}
+		/*
+		 * Manual Jump */
+		if (Gdx.input.justTouched()) {
+				birds[0].Tapme();
+				//Flappybird.Sounds.get(config.SoundsJump).play();
+		}
 		if (duraTimepipe > config.KtimeAddPipe) {
-			if (bird.isTapPipe()) {
+			//if (birds.isTapPipe()) {  				??????????
 				duraTimepipe = 0;
 				addPipe();
-			}
+			//}
 		}
 		stage.act();
 		stage.draw();
-		if (!bird.TapPipe)
-			bird.TapPipe = true;
-	}
-	
-	public List<?> getStage(int key){
-		//return map for bird with key
-		return null;
+
 	}
 
 	@Override
@@ -152,21 +158,23 @@ public class Screenplay implements Screen {
 		stage.clear();
 		Pipe.setPIPE_HIT(1);
 		addBackground();
-		addBird();
+		for (int i=0;i<population;i++)
+			addBird(i);
 		addScore();
 		addLand();
 	}
 
-	public void addBird() {
+	public void addBird(int id) {
 		TextureRegion[] birdRegions = new TextureRegion[] {
 				Atlas.findRegion("bird1"), Atlas.findRegion("bird2"),
 				Atlas.findRegion("bird3") };
-		bird = new AiBird(birdRegions);
+		AiBird bird = new AiBird(birdRegions, id);
 		bird.setName("bird");
 		bird.setWidth(config.BirdWidth);
 		bird.setHeight(config.BirdHeigth);
 		bird.setPosition(config.screenWidth / 2 - bird.getWidth(),
 				config.screenHeigth / 2);
+		birds[id] = bird;
 		stage.addActor(bird);
 	}
 
@@ -196,13 +204,13 @@ public class Screenplay implements Screen {
 		if (r == 0) {
 			dy = -dy;
 		}
-		Pipe pipe1 = new Pipe(Atlas.findRegion("pipe1"), bird, true);
+		Pipe pipe1 = new Pipe(Atlas.findRegion("pipe1"), birds, true);
 		pipe1.setZIndex(1);
 		float x = Flappybird.VIEWPORT.x;
 		float y = (Flappybird.VIEWPORT.y - config.KlandHeight) / 2
 				+ config.KlandHeight + config.KholeBetwenPipe / 2;
 		pipe1.setPosition(x, y + dy);
-		Pipe pipe2 = new Pipe(Atlas.findRegion("pipe2"), bird, false);
+		Pipe pipe2 = new Pipe(Atlas.findRegion("pipe2"), birds, false);
 		pipe2.setZIndex(1);
 		y = (Flappybird.VIEWPORT.y - config.KlandHeight) / 2
 				+ config.KlandHeight - pipe2.getHeight()
@@ -217,11 +225,13 @@ public class Screenplay implements Screen {
 	
 		labelScore.setZIndex(pipe1.getZIndex());
 		land.setZIndex(pipe2.getZIndex());
-		bird.setZIndex(pipe2.getZIndex());
+		for (AiBird bird : birds){
+			bird.setZIndex(pipe2.getZIndex());
+		}
 	}
 
 	public void addLand() {
-		land = new Land(Atlas.findRegion("land"), bird);
+		land = new Land(Atlas.findRegion("land"), birds);
 		land.setName("land");
 		land.setPosition(0, 0);
 		stage.addActor(land);

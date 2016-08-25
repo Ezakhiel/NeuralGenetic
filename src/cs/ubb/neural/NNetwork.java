@@ -45,11 +45,6 @@ public class NNetwork {
 	}
 	
 	public void init(double[][] gene){
-		List<Integer> neuronsInLayers = new ArrayList();
-		neuronsInLayers.add(layerSize);
-		neuronsInLayers.add(layerSize);
-		neuronsInLayers.add(layerSize);
-		neuronsInLayers.add(1);
 		Layer percLayer = new Layer(layerSize);
 		Neuron[] perceptronArray = percLayer.getNeurons();
 		Layer hiddenLayer1 = new Layer(layerSize);
@@ -80,15 +75,12 @@ public class NNetwork {
 	}
 	
 	public void init(){
-		List<Integer> neuronsInLayers = new ArrayList();
-		neuronsInLayers.add(layerSize);
-		neuronsInLayers.add(layerSize);
-		neuronsInLayers.add(layerSize);
-		neuronsInLayers.add(1);
+
 		Layer percLayer = new Layer(layerSize,new NeuronProperties());
 		Layer hiddenLayer1 = new Layer(layerSize,new NeuronProperties());
 		Layer hiddenLayer2 = new Layer(layerSize,new NeuronProperties());
 		Layer outputLayer = new Layer(1,new NeuronProperties());
+		NeuronProperties np = new NeuronProperties();
 		MyInputFunction myInputFunction = new MyInputFunction();
 		for(int i=0; i<layerSize; i++){
 			for(int j=0; j<layerSize; j++){
@@ -152,7 +144,7 @@ public class NNetwork {
 			inputLayer[i].setInput(data[i]);
 		}
 		nn.calculate();
-		if (nn.getLayerAt(3).getNeuronAt(0).getOutput() > 0.3)
+		if (nn.getLayerAt(3).getNeuronAt(0).getOutput() > 0.5)
 			return true;
 		else
 			return false;

@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class AiBird extends Image {
 
+	public int id;
 	public int score;
 	private Action curAction;
 	Animation animation;
@@ -20,13 +21,14 @@ public class AiBird extends Image {
 	float dura;
 	boolean isDie, TapPipe;
 
-	public AiBird(TextureRegion[] regions) {
+	public AiBird(TextureRegion[] regions,int uid) {
 		super(regions[0]);
 		setOrigin(getWidth() / 2, getHeight() / 2);
 		animation = new Animation(0.03f, regions);
 		dura = 0;
 		isDie = false;
 		TapPipe = false;
+		id = uid;
 	}
 	//delta-> time
 	@Override
@@ -95,10 +97,10 @@ public class AiBird extends Image {
 		return TapPipe;
 	}
 
-	public void updateScore(int time) {
+	public int updateScore(int time) {
 		if (!isDie)
 			score += time;
-		Screenplay.labelScore.setText("" + score);
+		return score;
 	}
 
 	public float getDuraDown(float up, float down) {

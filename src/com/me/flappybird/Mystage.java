@@ -22,13 +22,14 @@ public class Mystage extends Stage {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		System.out.println("lol");
 		if (screenplay != null) {
-			if (screenplay.bird.isDie) {
+			/* For android manual input
+			if (screenplay.birds.isDie) {
 				screenplay.resetGame();
 			} else {
-				screenplay.bird.Tapme();
+				screenplay.birds.Tapme();
 			}
+			*/
 		}
 		return super.touchDown(screenX, screenY, pointer, button);
 	}

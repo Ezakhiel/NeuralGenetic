@@ -8,12 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class Land extends Image {
 
-	private AiBird bird;
+	private AiBird[] birds;
 	private boolean hit;
 
-	public Land(TextureRegion region, AiBird bird) {
+	public Land(TextureRegion region, AiBird[] bird) {
 		super(region);
-		this.bird = bird;
+		this.birds = bird;
 		addAction(forever(moveBy(-config.KlandWidth, 0, config.KmoveLeftDura)));
 		hit = true;
 	}
@@ -24,8 +24,15 @@ public class Land extends Image {
 		if (getX() <= -config.KlandWidth) {
 			setX(0);
 		}
-		if (checkcolistion()) {
-			bird.hitLand();
+		boolean allDead = true;
+		for (AiBird bird : birds){
+			if (checkcolistion(bird)) {
+				bird.hitLand();
+			}else{
+				allDead = false;
+			}
+		}
+		if (allDead){
 			clearActions();
 			if (hit && Pipe.getPIPE_HIT() == 1) {
 				hit = false;
@@ -35,7 +42,7 @@ public class Land extends Image {
 		}
 	}
 
-	public boolean checkcolistion() {
+	public boolean checkcolistion(AiBird bird) {
 		if (bird.getY() <= config.KlandHeight) {
 			return true;
 		} else {

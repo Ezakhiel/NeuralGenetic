@@ -9,28 +9,36 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 public class Pipe extends Image {
 
 	private boolean getScore;
-	private AiBird bird;
+	private AiBird[] birds;
 	public static int PIPE_HIT;
+	public boolean allDead;
 
-	public Pipe(TextureRegion region, AiBird bird, boolean getScore) {
+	public Pipe(TextureRegion region, AiBird[] bird, boolean getScore) {
 		super(region);
-		this.bird = bird;
+		this.birds = bird;
 		this.getScore = getScore;
 		actionmoveLeft();
+		allDead = false;
 	}
 
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		if (bird.isDie) {
+		allDead = true;
+		for (AiBird bird : birds){
+			if (!bird.isDie){
+				allDead = false;
+				checkcolistion(bird);
+				//addScore(bird);
+			}
+		}
+		if (allDead) {
 			clearActions();
 			return;
 		}
 		if (getX() < -getWidth()) {
 			remove();
 		}
-		addScore();
-		checkcolistion();
 	}
 
 	public static int getPIPE_HIT() {
@@ -47,8 +55,8 @@ public class Pipe extends Image {
 		moveLeft.setAmountX(-config.KlandWidth);
 		addAction(forever(moveLeft));
 	}
-
-	public void addScore() {
+	
+	public void addScore(AiBird bird) {
 		if (getX() <= bird.getX()) {
 			if (bird.getY() >= Flappybird.VIEWPORT.y) {
 				bird.hitMe();
@@ -66,17 +74,17 @@ public class Pipe extends Image {
 		}
 	}
 
-	public void checkcolistion() {
-		if (iscolistion()) {
+	public void checkcolistion(AiBird bird) {
+		if (iscolistion(bird)) {
 			PIPE_HIT = 0;
 			bird.hitMe();
-			Screenplay.land.clearActions();
+			//Screenplay.land.clearActions();
 			//DEAD
 			//Flappybird.Sounds.get(config.SoundsHit).play();
 		}
 	}
 
-	public boolean iscolistion() {
+	public boolean iscolistion(AiBird bird) {
 		float d = 2;
 		float maxx1 = getX() + getWidth();
 		float minx1 = getX() + d;

@@ -14,7 +14,7 @@ public class config {
 	
 	public static float KmoveLeftDura = 3;
 	
-	public static int KjumpHeight = 40;
+	public static int KjumpHeight = 30;
 	public static float KjumpDura = 0.3f;
 	
 	public static float KtimeAddPipe = 1.4f;

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="assets"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl.jar" sourcepath="libs/gdx-backend-lwjgl-sources.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-natives.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-natives.jar"/>
+	<classpathentry kind="lib" path="libs/neuroph-adapters-2.92.jar"/>
+	<classpathentry kind="lib" path="libs/neuroph-contrib-2.92.jar"/>
+	<classpathentry kind="lib" path="libs/neuroph-core-2.92.jar" sourcepath="libs/neuroph-core-2.92.jar"/>
+	<classpathentry kind="lib" path="libs/neuroph-imgrec-2.92.jar"/>
+	<classpathentry kind="lib" path="libs/neuroph-ocr-2.92.jar"/>
+	<classpathentry kind="lib" path="libs/neuroph-samples-2.92.jar"/>
+	<classpathentry kind="lib" path="libs/ajt-2.9.jar"/>
+	<classpathentry kind="lib" path="libs/android-x.x.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-sources.jar"/>
+	<classpathentry kind="lib" path="libs/javaml-0.1.7.jar"/>
+	<classpathentry kind="lib" path="libs/logback-classic-1.0.13.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-nop-1.7.6.jar"/>
+	<classpathentry kind="lib" path="libs/weka.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-sources.jar"/>
+	<classpathentry kind="lib" path="libs/gdx.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
