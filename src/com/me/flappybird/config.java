@@ -14,7 +14,7 @@ public class config {
 	
 	public static float KmoveLeftDura = 3;
 	
-	public static int KjumpHeight = 30;
+	public static int KjumpHeight = 1;
 	public static float KjumpDura = 0.3f;
 	
 	public static float KtimeAddPipe = 1.4f;
@@ -49,4 +49,8 @@ public class config {
 	public static int trueYOrigo = KlandHeight;
 	public static int trueWidth = (int) (screenWidth/2 + BirdWidth);
 	public static int trueHeigth = screenHeigth - KlandHeight;
+	
+	public static float PIPEVALUE = -5.0f;
+	public static float NOTHING = 0f;
+	public static float BRDVALUE = 50f;
 }

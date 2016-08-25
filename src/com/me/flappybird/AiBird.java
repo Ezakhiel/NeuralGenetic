@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
-import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.actions.RotateToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -50,7 +49,7 @@ public class AiBird extends Image {
 		//faceup.setDuration(config.KjumpDura);
 		//faceup.setRotation(30);
 		MoveToAction moveup = new MoveToAction();
-		moveup.setDuration(config.KjumpDura);
+		//moveup.setDuration(config.KjumpDura);
 		moveup.setPosition(getX(), y);
 		moveup.setInterpolation(Interpolation.sineIn);
 		//Action fly = new ParallelAction(faceup, moveup);

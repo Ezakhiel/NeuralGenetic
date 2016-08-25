@@ -1,44 +1,31 @@
 package com.me.flappybird;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.SnapshotArray;
+
+import java.util.Arrays;
 
 import cs.ubb.Genetic.GeneticLearn;
-import net.sf.javaml.utils.ArrayUtils;
 
 public class Screenplay implements Screen {
-
+	
 	private TextureAtlas Atlas;
 	private Stage stage;
 	public AiBird[] birds;
 	public static Land land;
 	public static Label labelScore;
 	private float duraTimepipe;
-	private float check; //check when to make map
 	Array<Actor> allActors;
-	public ArrayList screen;
 	double[][][] data ;
 	GeneticLearn gLearn;
 	public int population;
@@ -57,7 +44,7 @@ public class Screenplay implements Screen {
 	private void clearData(){
 		for (double[][] map : data)
 			for (double[] row : map)
-				Arrays.fill(row, 0);
+				Arrays.fill(row, config.NOTHING);
 	}
 
 	private void printMap(){
@@ -88,7 +75,7 @@ public class Screenplay implements Screen {
 						//System.out.println("Bird at:"+ actor.getX() +": " + actor.getY());
 						data[((AiBird)actor).id]
 							[getDataYLocation(actor.getY())]
-							[getDataXLocation(actor.getX())] = 3;
+							[getDataXLocation(actor.getX())] = config.BRDVALUE;
 						break;
 						
 					case "Pipe2":
@@ -98,10 +85,10 @@ public class Screenplay implements Screen {
 						for (int i=0; i<config.dataHeigth; i++){
 							if (i == tmpYLoc+1 || i == tmpYLoc+2)
 								for (double[][] map : data)
-									map[i][tmpXLoc] = 0;
+									map[i][tmpXLoc] = config.NOTHING;
 							else
 								for (double[][] map : data)
-									map[i][tmpXLoc] = 1;
+									map[i][tmpXLoc] = config.PIPEVALUE;
 						}
 						//data[getDataYLocation(actor.getY())][getDataXLocation(actor.getX())] = 1;
 						break;
@@ -115,8 +102,10 @@ public class Screenplay implements Screen {
 		for (AiBird bird : birds){
 			if (!bird.isDie){
 				allDead = false;
+				//System.out.print("NN " + bird.id + ":");
+				normalizeInput(bird.id);
 				if (gLearn.decision(0, data[bird.id])){
-						//bird.Tapme();
+						bird.Tapme();
 				}
 				// FITNESS = time alive
 				bird.updateScore((int)Math.ceil(delta));
@@ -129,10 +118,9 @@ public class Screenplay implements Screen {
 		}
 		/*
 		 * Manual Jump */
-		if (Gdx.input.justTouched()) {
-				birds[0].Tapme();
-				//Flappybird.Sounds.get(config.SoundsJump).play();
-		}
+//		if (Gdx.input.justTouched()) {
+//				birds[0].Tapme();
+//		}
 		if (duraTimepipe > config.KtimeAddPipe) {
 			//if (birds.isTapPipe()) {  				??????????
 				duraTimepipe = 0;
@@ -261,10 +249,6 @@ public class Screenplay implements Screen {
 
 	}
 
-	public static Vector2 getStageLocation(Actor actor) {
-		return actor.localToStageCoordinates(new Vector2(0, 0));
-		
-	}
 	public double getNormalizedXLocation(double x){
 		return (x - config.trueXOrigo);
 	}
@@ -277,6 +261,14 @@ public class Screenplay implements Screen {
 	}
 	public int getDataYLocation(double y){
 		return (int)((y - config.trueYOrigo)/config.BirdHeigth);
+	}
+	
+	private void normalizeInput(int index){
+		for (int i=0; i< config.dataWidth; i++){
+			for (int j=0; j< config.dataHeigth; j++) {
+				data[index][j][i] = (data[index][j][i] - config.PIPEVALUE) / (config.BRDVALUE - config.PIPEVALUE);
+			}
+		}
 	}
 
 }

@@ -3,7 +3,7 @@ package cs.ubb.neural;
 import org.neuroph.core.Connection;
 import org.neuroph.core.input.InputFunction;
 
-public class MyInputFunction extends InputFunction{
+public class MeanInputFunction extends InputFunction{
 
 	@Override
 	public double getOutput(Connection[] inputConnections) {
