@@ -15,18 +15,20 @@ public class Flappybird extends Game {
 	public AssetManager manager = new AssetManager();
 	public static HashMap<String, Sound> Sounds = new HashMap<String, Sound>();
 	private GeneticLearn gL;
+	private Screenplay screenplay;
 
-	public Flappybird(GeneticLearn gLearn) {
+	public Flappybird(GeneticLearn gLearn,Screenplay screenplay) {
 		// TODO Auto-generated constructor stub
 		gL = gLearn;
+		this.screenplay = screenplay;
+		this.screenplay = new Screenplay(this,gL);
 	}
 	@Override
 	public void create() {
 //		Sounds.put(config.SoundsHit, Gdx.audio.newSound(Gdx.files.internal("data/sounds/sfx_hit.mp3")));
 //		Sounds.put(config.SoundsScore, Gdx.audio.newSound(Gdx.files.internal("data/sounds/sfx_point.mp3")));
 //		Sounds.put(config.SoundsJump, Gdx.audio.newSound(Gdx.files.internal("data/sounds/sfx_wing.mp3")));
-		
-		setScreen(new Screenplay(this,gL));
+		setScreen(screenplay);
 	}
 
 	@Override
@@ -42,6 +44,16 @@ public class Flappybird extends Game {
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
 		super.resize(width, height);
+	}
+	
+	@Override
+	public void pause(){
+		super.pause();
+	}
+	
+	@Override
+	public void resume(){
+		super.resume();
 	}
 
 }
