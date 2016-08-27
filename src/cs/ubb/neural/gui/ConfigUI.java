@@ -1,28 +1,14 @@
 package cs.ubb.neural.gui;
 
-import java.awt.EventQueue;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.SwingWorker;
-
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.me.flappybird.Flappybird;
+import javax.swing.*;
 
 import cs.ubb.Genetic.GeneticDTO;
 import cs.ubb.Genetic.GeneticLearn;
-import cs.ubb.neural.NNetwork;
-
-import javax.swing.JLabel;
-import java.awt.Font;
-import java.awt.Frame;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JCheckBox;
 
 public class ConfigUI implements Runnable{
 
@@ -31,10 +17,13 @@ public class ConfigUI implements Runnable{
 	private JTextField txtSelection;
 	private JTextField txtPopCount;
 	private JTextField txtMutation;
+	private JTextField txtMutationVolitality;
 	private GeneticLearn geneticLearn;
 	private GeneticDTO geneticDTO;
 	private JLabel lblPleaseConfigure;
 	private JButton btnStart;
+	private JButton btnEvolve;
+	private JTextField txtLoadGen;
 	
 	/**
 	 * Create the application.
@@ -54,11 +43,15 @@ public class ConfigUI implements Runnable{
 		
 		txtMutation = new JTextField();
 		txtMutation.setText("20");
-		txtMutation.setBounds(22, 26, 86, 20);
+		txtMutation.setBounds(22, 26, 43, 20);
 		frame.getContentPane().add(txtMutation);
-		txtMutation.setColumns(10);
 		
-		JLabel lblMutation = new JLabel("Mutation percentage");
+		txtMutationVolitality = new JTextField();
+		txtMutationVolitality.setText("20");
+		txtMutationVolitality.setBounds(70, 26, 43, 20);
+		frame.getContentPane().add(txtMutationVolitality);
+		
+		JLabel lblMutation = new JLabel("Mutation percentage/strength");
 		lblMutation.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblMutation.setBounds(128, 29, 135, 14);
 		frame.getContentPane().add(lblMutation);
@@ -96,6 +89,17 @@ public class ConfigUI implements Runnable{
 		lblPopCount.setBounds(128, 122, 135, 14);
 		frame.getContentPane().add(lblPopCount);
 		
+		txtLoadGen = new JTextField();
+		txtLoadGen.setText("1");
+		txtLoadGen.setColumns(10);
+		txtLoadGen.setBounds(22, 149, 86, 20);
+		frame.getContentPane().add(txtLoadGen);
+		
+		JLabel lblLoadGen = new JLabel("Load Gen.");
+		lblLoadGen.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblLoadGen.setBounds(128, 149, 135, 14);
+		frame.getContentPane().add(lblLoadGen);
+		
 		JButton btnGenerate = new JButton("Generate");
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -113,11 +117,24 @@ public class ConfigUI implements Runnable{
 		btnStart.setEnabled(false);
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				geneticLearn.learn();
+				geneticLearn.play();
+				btnStart.setEnabled(false);
+				btnEvolve.setEnabled(true);
 			}
 		});
 		btnStart.setBounds(131, 295, 89, 23);
 		frame.getContentPane().add(btnStart);
+		
+		btnEvolve = new JButton("Evolve");
+		btnEvolve.setEnabled(false);
+		btnEvolve.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				geneticLearn.evolve();
+				btnStart.setEnabled(true);
+			}
+		});
+		btnEvolve.setBounds(131, 265, 89, 23);
+		frame.getContentPane().add(btnEvolve);
 		
 		lblPleaseConfigure = new JLabel("Please Configure");
 		lblPleaseConfigure.setBounds(22, 203, 241, 31);
@@ -127,11 +144,13 @@ public class ConfigUI implements Runnable{
 		btnLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isSet()){
-					
-					geneticLearn.randomWeights();
-					geneticLearn.getWeights(0);
-					//lblPleaseConfigure.setText("Networks set, please start!");
-					//btnStart.setEnabled(true);
+					try {
+						geneticLearn.loadFromFile(Integer.parseInt(txtLoadGen.getText()));
+						btnStart.setEnabled(true);
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+						System.out.println("COULD NOT LOAD GENERATION!!!");
+					}
 				}
 			}
 		});
@@ -149,33 +168,22 @@ public class ConfigUI implements Runnable{
 			e.printStackTrace();
 		}
 	}
-	private boolean isSet(){
-		try{
+	private boolean isSet() {
 		double cross = Double.parseDouble(txtCrossing.getText());
 		double selection = Double.parseDouble(txtSelection.getText());
 		double mutate = Double.parseDouble(txtMutation.getText());
-		double randPercentage = Math.abs((cross+selection+mutate)-100.0);
+		int mutationVolitality = Integer.parseInt(txtMutationVolitality.getText());
+		double randPercentage = Math.abs((cross + selection + mutate) - 100.0);
+		if (randPercentage <= 0.000001) {
+			lblPleaseConfigure.setText("Random Genes very low");
+		}
 		int pop = Integer.parseInt(txtPopCount.getText());
-		if (pop < 0){
+		if (pop < 0) {
 			lblPleaseConfigure.setText("Wrong population set!");
 			return false;
 		}
-		if ( randPercentage <= 0.000001){
-			geneticDTO = new GeneticDTO(cross,selection, mutate, randPercentage, pop);
-			geneticLearn = new GeneticLearn(geneticDTO);
-			lblPleaseConfigure.setText("Random Genes very low");
-			return true;
-		}else if( randPercentage > 0.000001){
-			geneticDTO = new GeneticDTO(cross,selection, mutate, randPercentage, pop);
-			geneticLearn = new GeneticLearn(geneticDTO);
-			return true;
-		}
-		lblPleaseConfigure.setText("Configuration wrong!");
-		return false;
-		}catch (NumberFormatException e){
-			lblPleaseConfigure.setText("Configuration format wrong!");
-			return false;
-		}
+		geneticDTO = new GeneticDTO(cross, selection, mutate, mutationVolitality, randPercentage, pop);
+		if (geneticLearn == null) geneticLearn = new GeneticLearn(geneticDTO);
+		return true;
 	}
-
 }

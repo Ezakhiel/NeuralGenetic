@@ -53,4 +53,19 @@ public class config {
 	public static float PIPEVALUE = -5.0f;
 	public static float NOTHING = 0f;
 	public static float BRDVALUE = 50f;
+	
+	public static int ONEGENTIMER = 1;
+	
+	public static int PERCEPTRONSIZE = dataHeigth *dataWidth;
+	public static int HIDDENLAYERSIZE1 = PERCEPTRONSIZE * 3;
+	public static int HIDDENLAYERSIZE2 = PERCEPTRONSIZE / 2;
+	public static int OUTPUTLAYERSIZE = 1;
+	public static int FIRSTCONNECTIONCOUNT = PERCEPTRONSIZE * HIDDENLAYERSIZE1;
+	public static int SECONDCONNECTIONCOUNT = HIDDENLAYERSIZE1 * HIDDENLAYERSIZE2;
+	public static int THIRDCONNECTIONCOUNT = HIDDENLAYERSIZE2;
+	
+	public static int CONNECTIONCOUNT = FIRSTCONNECTIONCOUNT +
+										SECONDCONNECTIONCOUNT +
+										THIRDCONNECTIONCOUNT;
+	
 }

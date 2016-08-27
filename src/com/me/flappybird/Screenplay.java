@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Array;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import cs.ubb.Genetic.GeneticLearn;
@@ -30,15 +31,18 @@ public class Screenplay implements Screen {
 	GeneticLearn gLearn;
 	public int population;
 	public static boolean allDead;
+	int timesPlayed;
 
 	public Screenplay(Flappybird game, GeneticLearn gL) {
 		stage = new Stage();
 		game.manager.load("data/flappy.txt", TextureAtlas.class);
 		game.manager.finishLoading();
 		Atlas = game.manager.get("data/flappy.txt", TextureAtlas.class);
-		gLearn = gL;population = gL.geneticDTO.population;
+		gLearn = gL;
+		population = gL.geneticDTO.population;
 		data = new double[population][config.dataHeigth][config.dataWidth];
 		birds = new AiBird[population];
+		timesPlayed = 1;
 	}
 
 	private void clearData(){
@@ -98,6 +102,7 @@ public class Screenplay implements Screen {
 		}
 		//how often to get data
 		 //print data
+		allDead = true;
 		duraTimepipe += delta;
 		for (AiBird bird : birds){
 			if (!bird.isDie){
@@ -143,13 +148,26 @@ public class Screenplay implements Screen {
 	}
 
 	public void resetGame() {
+		if (timesPlayed > config.ONEGENTIMER){
+			gLearn.setFitness(birds);
+			try {
+				gLearn.save();
+			} catch (IOException e) {
+				System.out.println("ERROR SAVING POPULATION!");
+			}
+			return;
+		}
 		stage.clear();
+		timesPlayed++;
 		Pipe.setPIPE_HIT(1);
 		addBackground();
 		for (int i=0;i<population;i++)
 			addBird(i);
 		addScore();
 		addLand();
+	}
+	public void startNewGame() {
+		
 	}
 
 	public void addBird(int id) {
@@ -240,13 +258,15 @@ public class Screenplay implements Screen {
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
-
+		stage.clear();
 	}
 
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
-
+	}
+	public void exit(){
+		
 	}
 
 	public double getNormalizedXLocation(double x){
