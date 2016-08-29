@@ -22,7 +22,6 @@ public class ConfigUI implements Runnable{
 	private GeneticDTO geneticDTO;
 	private JLabel lblPleaseConfigure;
 	private JButton btnStart;
-	private JButton btnEvolve;
 	private JTextField txtLoadGen;
 	
 	/**
@@ -42,12 +41,12 @@ public class ConfigUI implements Runnable{
 		frame.getContentPane().setLayout(null);
 		
 		txtMutation = new JTextField();
-		txtMutation.setText("20");
+		txtMutation.setText("30");
 		txtMutation.setBounds(22, 26, 43, 20);
 		frame.getContentPane().add(txtMutation);
 		
 		txtMutationVolitality = new JTextField();
-		txtMutationVolitality.setText("20");
+		txtMutationVolitality.setText("50");
 		txtMutationVolitality.setBounds(70, 26, 43, 20);
 		frame.getContentPane().add(txtMutationVolitality);
 		
@@ -57,7 +56,7 @@ public class ConfigUI implements Runnable{
 		frame.getContentPane().add(lblMutation);
 		
 		txtCrossing = new JTextField();
-		txtCrossing.setText("30");
+		txtCrossing.setText("20");
 		txtCrossing.setColumns(10);
 		txtCrossing.setBounds(22, 57, 86, 20);
 		frame.getContentPane().add(txtCrossing);
@@ -79,7 +78,7 @@ public class ConfigUI implements Runnable{
 		frame.getContentPane().add(lblSelection);
 		
 		txtPopCount = new JTextField();
-		txtPopCount.setText("1");
+		txtPopCount.setText("300");
 		txtPopCount.setColumns(10);
 		txtPopCount.setBounds(22, 119, 86, 20);
 		frame.getContentPane().add(txtPopCount);
@@ -104,7 +103,7 @@ public class ConfigUI implements Runnable{
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isSet()){
-					geneticLearn.randomWeights();
+					geneticLearn.randomIntWeights();
 					lblPleaseConfigure.setText("Networks set, please start!");
 					btnStart.setEnabled(true);
 				}
@@ -119,22 +118,10 @@ public class ConfigUI implements Runnable{
 			public void actionPerformed(ActionEvent e) {
 				geneticLearn.play();
 				btnStart.setEnabled(false);
-				btnEvolve.setEnabled(true);
 			}
 		});
 		btnStart.setBounds(131, 295, 89, 23);
 		frame.getContentPane().add(btnStart);
-		
-		btnEvolve = new JButton("Evolve");
-		btnEvolve.setEnabled(false);
-		btnEvolve.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				geneticLearn.evolve();
-				btnStart.setEnabled(true);
-			}
-		});
-		btnEvolve.setBounds(131, 265, 89, 23);
-		frame.getContentPane().add(btnEvolve);
 		
 		lblPleaseConfigure = new JLabel("Please Configure");
 		lblPleaseConfigure.setBounds(22, 203, 241, 31);

@@ -15,20 +15,19 @@ public class Flappybird extends Game {
 	public AssetManager manager = new AssetManager();
 	public static HashMap<String, Sound> Sounds = new HashMap<String, Sound>();
 	private GeneticLearn gL;
-	private Screenplay screenplay;
+	public Screenplay sP;
 
-	public Flappybird(GeneticLearn gLearn,Screenplay screenplay) {
+	public Flappybird(GeneticLearn gLearn) {
 		// TODO Auto-generated constructor stub
 		gL = gLearn;
-		this.screenplay = screenplay;
-		this.screenplay = new Screenplay(this,gL);
 	}
 	@Override
 	public void create() {
 //		Sounds.put(config.SoundsHit, Gdx.audio.newSound(Gdx.files.internal("data/sounds/sfx_hit.mp3")));
 //		Sounds.put(config.SoundsScore, Gdx.audio.newSound(Gdx.files.internal("data/sounds/sfx_point.mp3")));
 //		Sounds.put(config.SoundsJump, Gdx.audio.newSound(Gdx.files.internal("data/sounds/sfx_wing.mp3")));
-		setScreen(screenplay);
+		sP = new Screenplay(this,gL);
+		setScreen(sP);
 	}
 
 	@Override

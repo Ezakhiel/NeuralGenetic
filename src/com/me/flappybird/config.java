@@ -14,32 +14,54 @@ public class config {
 	
 	public static float KmoveLeftDura = 3;
 	
-	public static int KjumpHeight = 1;
-	public static float KjumpDura = 0.3f;
 	
-	public static float KtimeAddPipe = 1.4f;
+	public static float KtimeAddPipe = 6;
 	public static float PipeWidth = 30.0f;
 	
 	public static float BirdWidth = 20.0f;
 	public static float BirdHeigth = 32.0f;
 	
-	public static int makeMapTimer = 10;
 	
-	public static float KholeBetwenPipe = 128;
+	public static float KholeBetwenPipe = BirdHeigth * 4;
 	
-	public static float FallSpeed = 2.0f;
+	public static float KjumpHeight = BirdHeigth * 1.5f;
+	public static float KjumpDura = 0.3f;
+	
+	//public static float FallSpeed = 0.3f;
 	
 	// NEURAL NETWORK VARS
 	
+	public static Random random = new Random();
+	
+	public static double MUTATIONLOWERBOUND = 0f;
+	public static double MUTATIONUPPERBOUND = 1f;
+	
 	public static int random(int min, int max) {
-		Random random = new Random();
 		return random.nextInt(max - min + 1) + min;
 	}
 	public static double random() {
-		Random random = new Random();
 		return random.nextDouble();
 	}
 	
+	public static double randDecrease(double number, double rangeMax, double rangeMin){
+		//double change = random.nextDouble();
+		//return (number > change) ? number-change : 0;
+		return 0;
+	}
+	
+	public static double randIncrease(double number, double rangeMax, double rangeMin){
+		//double change = random.nextDouble();
+		//return (number+change > 1) ? 1 : number+change;
+		return 1;
+	}
+	
+	public static double randMutate(double number, double rangeMax, double rangeMin){
+		double change = rangeMin + (rangeMax - rangeMin) * random.nextDouble();
+		if (random.nextDouble() > 0.5)
+			return (number+change > 1) ? 1 : number+change;
+		else
+			return (number > change) ? number-change : 0;
+	}
 	public static int screenWidth = 360;
 	public static int screenHeigth = 432;
 	public static int dataWidth = 10;
@@ -50,22 +72,21 @@ public class config {
 	public static int trueWidth = (int) (screenWidth/2 + BirdWidth);
 	public static int trueHeigth = screenHeigth - KlandHeight;
 	
-	public static float PIPEVALUE = -5.0f;
-	public static float NOTHING = 0f;
-	public static float BRDVALUE = 50f;
+	public static float PIPEVALUE = 1.0f;
+	public static float NOTHING = 0.0f;
+	public static float BRDVALUE = 1.0f;
+
+	public static float makeDecisionTimer = 0.2f;
 	
-	public static int ONEGENTIMER = 1;
-	
-	public static int PERCEPTRONSIZE = dataHeigth *dataWidth;
-	public static int HIDDENLAYERSIZE1 = PERCEPTRONSIZE * 3;
-	public static int HIDDENLAYERSIZE2 = PERCEPTRONSIZE / 2;
+	public static int ONEGENTIMER = 15;
+	public static int GENETICAGEOUT = 7;
+
+	public static int PERCEPTRONSIZEPIPE = dataHeigth * (dataWidth-1);
+	public static int PERCEPTRONSIZEBIRD =  dataHeigth;
 	public static int OUTPUTLAYERSIZE = 1;
-	public static int FIRSTCONNECTIONCOUNT = PERCEPTRONSIZE * HIDDENLAYERSIZE1;
-	public static int SECONDCONNECTIONCOUNT = HIDDENLAYERSIZE1 * HIDDENLAYERSIZE2;
-	public static int THIRDCONNECTIONCOUNT = HIDDENLAYERSIZE2;
 	
-	public static int CONNECTIONCOUNT = FIRSTCONNECTIONCOUNT +
-										SECONDCONNECTIONCOUNT +
-										THIRDCONNECTIONCOUNT;
+	public static int CONNECTIONCOUNT =  PERCEPTRONSIZEBIRD * PERCEPTRONSIZEPIPE
+										+ PERCEPTRONSIZEPIPE;
+	
 	
 }

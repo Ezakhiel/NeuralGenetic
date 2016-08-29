@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="libs/gdx-natives.jar"/>
 	<classpathentry kind="lib" path="libs/neuroph-adapters-2.92.jar"/>
 	<classpathentry kind="lib" path="libs/neuroph-contrib-2.92.jar"/>
-	<classpathentry kind="lib" path="libs/neuroph-core-2.92.jar" sourcepath="libs/neuroph-core-2.92.jar"/>
+	<classpathentry kind="lib" path="libs/neuroph-core-2.92.jar" sourcepath="C:/Users/Huszar/Desktop/neuroph-2.92/neuroph-2.92/sources/neuroph-2.92"/>
 	<classpathentry kind="lib" path="libs/neuroph-imgrec-2.92.jar"/>
 	<classpathentry kind="lib" path="libs/neuroph-ocr-2.92.jar"/>
 	<classpathentry kind="lib" path="libs/neuroph-samples-2.92.jar"/>
@@ -21,6 +21,7 @@
 	<classpathentry kind="lib" path="libs/slf4j-nop-1.7.6.jar"/>
 	<classpathentry kind="lib" path="libs/weka.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-sources.jar"/>
-	<classpathentry kind="lib" path="libs/gdx.jar"/>
+	<classpathentry kind="lib" path="libs/gdx.jar" sourcepath="libs/gdx-sources.jar"/>
+	<classpathentry kind="lib" path="F:/testFolder/NeuralGenetic/libs/commons-lang3-3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

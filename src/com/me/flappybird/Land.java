@@ -43,10 +43,14 @@ public class Land extends Image {
 	}
 
 	public boolean checkcolistion(AiBird bird) {
-		if (bird.getY() <= config.KlandHeight) {
+		if (bird.getY() >= config.screenHeigth) {
 			return true;
 		} else {
-			return false;
+			if (bird.getY() <= config.KlandHeight) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 

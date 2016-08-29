@@ -13,10 +13,9 @@ public class Pipe extends Image {
 	public static int PIPE_HIT;
 	public boolean allDead;
 
-	public Pipe(TextureRegion region, AiBird[] bird, boolean getScore) {
+	public Pipe(TextureRegion region, AiBird[] bird) {
 		super(region);
 		this.birds = bird;
-		this.getScore = getScore;
 		actionmoveLeft();
 		allDead = false;
 	}

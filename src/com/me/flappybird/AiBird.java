@@ -49,7 +49,7 @@ public class AiBird extends Image {
 		//faceup.setDuration(config.KjumpDura);
 		//faceup.setRotation(30);
 		MoveToAction moveup = new MoveToAction();
-		//moveup.setDuration(config.KjumpDura);
+		moveup.setDuration(config.KjumpDura);
 		moveup.setPosition(getX(), y);
 		moveup.setInterpolation(Interpolation.sineIn);
 		//Action fly = new ParallelAction(faceup, moveup);
@@ -63,6 +63,16 @@ public class AiBird extends Image {
 		//moveDown.setInterpolation(Interpolation.sineIn);
 		//Action fall = new ParallelAction(faceDown, moveDown);
 		curAction = new SequenceAction(moveup, moveDown);
+		addAction(curAction);
+	}
+	
+	public void fall(){
+		float y = getY();
+		float duration = getDuraDown(y, config.KlandHeight);
+		MoveToAction moveDown = new MoveToAction();
+		moveDown.setDuration(duration);
+		moveDown.setPosition(getX(), config.KlandHeight);
+		curAction = new SequenceAction(moveDown);
 		addAction(curAction);
 	}
 
@@ -109,7 +119,7 @@ public class AiBird extends Image {
 		if (dy <= config.KjumpHeight) {
 			Dura = config.KjumpDura;
 		} else {
-			Dura = config.FallSpeed;
+			Dura = (dy/config.KjumpHeight) * config.KjumpDura;
 		}
 		return Dura;
 	}

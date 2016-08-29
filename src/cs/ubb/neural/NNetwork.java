@@ -3,9 +3,13 @@ package cs.ubb.neural;
 import com.me.flappybird.config;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.neuroph.core.Connection;
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.Neuron;
+import org.neuroph.core.input.And;
+import org.neuroph.core.input.InputFunction;
+import org.neuroph.core.input.Max;
 import org.neuroph.core.learning.LearningRule;
 import org.neuroph.util.ConnectionFactory;
 import org.neuroph.util.NeuronProperties;
@@ -20,11 +24,21 @@ public class NNetwork {
 	public int fitness;
 	double minWeight;
 	double maxWeight;
+	public int jumpCount;
+	public int noJump;
+	public int age;
+	NeuronProperties np;
 	
 	
 	public NNetwork(double minW,double maxW){
 		minWeight = minW;
 		maxWeight = maxW;
+		jumpCount = 0;
+		noJump = 0;
+		age = 1;
+		np = new NeuronProperties();
+		np.setProperty("inputFunction", SpecialInputFunction.class);
+		//np.setProperty("transferFunction", TransferFunctionType.SIGMOID);
 	}
 	public boolean saveNetwork(String fileName){
 		try{
@@ -38,133 +52,75 @@ public class NNetwork {
 		nn.load(inStream);
 	}
 	
-	public void init(double[][] gene){
-		NeuronProperties np = new NeuronProperties();
-		np.setProperty("transferFunction", TransferFunctionType.SIGMOID);
-		Layer percLayer = new Layer(config.PERCEPTRONSIZE, new NeuronProperties());
-		Neuron[] perceptronArray = percLayer.getNeurons();
-		Layer hiddenLayer1 = new Layer(config.HIDDENLAYERSIZE1, new NeuronProperties());
-		Layer hiddenLayer2 = new Layer(config.HIDDENLAYERSIZE2, new NeuronProperties());
-		Layer outputLayer = new Layer(config.OUTPUTLAYERSIZE, np);
-		Neuron[] outNeuron = outputLayer.getNeurons();
-		for(int i=0; i<config.PERCEPTRONSIZE; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE1; j++) {
-				ConnectionFactory.createConnection(perceptronArray[i], hiddenLayer1.getNeuronAt(j), gene[0][i * j]);
-			}
-		}
-		for(int i=0; i<config.HIDDENLAYERSIZE1; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE2; j++) {
-				ConnectionFactory.createConnection(hiddenLayer1.getNeuronAt(i), hiddenLayer2.getNeuronAt(j), gene[1][i * j]);
-			}
-		}
-		for(int i=0; i<config.HIDDENLAYERSIZE2; i++){
-			ConnectionFactory.createConnection(
-					hiddenLayer2.getNeuronAt(i), 
-					outNeuron[0],
-					gene[2][i]);
-		}
-		nn = new NeuralNetwork<LearningRule>();
-		nn.addLayer(0, percLayer);
-		nn.addLayer(1, hiddenLayer1);
-		nn.addLayer(2, hiddenLayer2);
-		nn.addLayer(3, outputLayer);
-	}
-	
-	public void init(double[] gene){
-		double[][] setGene = new double[3][];
-		setGene[0] = new double[config.FIRSTCONNECTIONCOUNT];
-		setGene[1] = new double[config.SECONDCONNECTIONCOUNT];
-		setGene[2] = new double[config.THIRDCONNECTIONCOUNT];
-		for(int i=0; i<config.PERCEPTRONSIZE; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE1; j++) {
-				setGene[0][i*j] = gene[i * j];
-			}
-		}
-		for(int i=0; i<config.HIDDENLAYERSIZE1; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE2; j++) {
-				setGene[1][i*j] = gene[config.FIRSTCONNECTIONCOUNT + i * j];
-			}
-		}
-		for(int i=0; i<config.HIDDENLAYERSIZE2; i++){
-			setGene[1][i] = gene[config.FIRSTCONNECTIONCOUNT + config.SECONDCONNECTIONCOUNT+ i];
-		}
-		NeuronProperties np = new NeuronProperties();
-		np.setProperty("transferFunction", TransferFunctionType.SIGMOID);
-		Layer percLayer = new Layer(config.PERCEPTRONSIZE, new NeuronProperties());
-		Neuron[] perceptronArray = percLayer.getNeurons();
-		Layer hiddenLayer1 = new Layer(config.HIDDENLAYERSIZE1, new NeuronProperties());
-		Layer hiddenLayer2 = new Layer(config.HIDDENLAYERSIZE2, new NeuronProperties());
-		Layer outputLayer = new Layer(config.OUTPUTLAYERSIZE, np);
-		Neuron[] outNeuron = outputLayer.getNeurons();
-		for(int i=0; i<config.PERCEPTRONSIZE; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE1; j++) {
-				ConnectionFactory.createConnection(perceptronArray[i], hiddenLayer1.getNeuronAt(j), gene[i * j]);
-			}
-		}
-		for(int i=0; i<config.HIDDENLAYERSIZE1; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE2; j++) {
-				ConnectionFactory.createConnection(hiddenLayer1.getNeuronAt(i), hiddenLayer2.getNeuronAt(j), gene[config.FIRSTCONNECTIONCOUNT + i * j]);
-			}
-		}
-		for(int i=0; i<config.HIDDENLAYERSIZE2; i++){
-			ConnectionFactory.createConnection(
-					hiddenLayer2.getNeuronAt(i),
-					outNeuron[0],
-					gene[config.FIRSTCONNECTIONCOUNT + config.SECONDCONNECTIONCOUNT+ i]);
-		}
-		nn = new NeuralNetwork<LearningRule>();
-		nn.addLayer(0, percLayer);
-		nn.addLayer(1, hiddenLayer1);
-		nn.addLayer(2, hiddenLayer2);
-		nn.addLayer(3, outputLayer);
-	}
-	
-	public void init(){
-		NeuronProperties np = new NeuronProperties();
-		np.setProperty("transferFunction", TransferFunctionType.SIGMOID);
-		Layer percLayer = new Layer(config.PERCEPTRONSIZE, new NeuronProperties());
-		Neuron[] perceptronArray = percLayer.getNeurons();
-		Layer hiddenLayer1 = new Layer(config.HIDDENLAYERSIZE1, new NeuronProperties());
-		Layer hiddenLayer2 = new Layer(config.HIDDENLAYERSIZE2, new NeuronProperties());
-		Layer outputLayer = new Layer(config.OUTPUTLAYERSIZE, np);
-		Neuron[] outNeuron = outputLayer.getNeurons();
-		MeanInputFunction meanInputFunction = new MeanInputFunction();
-		for (Neuron neuron : perceptronArray)
-			neuron.setInputFunction(meanInputFunction);
-		for (Neuron neuron : hiddenLayer1.getNeurons())
-			neuron.setInputFunction((meanInputFunction));
-		for (Neuron neuron : hiddenLayer2.getNeurons())
-			neuron.setInputFunction(meanInputFunction);
-		outNeuron[0].setInputFunction(meanInputFunction);
+	public void initActivatorNetwork(double[] gene){
+		Layer inLayerPipes = new Layer(config.PERCEPTRONSIZEPIPE, new NeuronProperties());
+		Neuron[] inArrayPipes = inLayerPipes.getNeurons();
 		
-		for(int i=0; i<config.PERCEPTRONSIZE; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE1; j++) {
-				ConnectionFactory.createConnection(perceptronArray[i], hiddenLayer1.getNeuronAt(j));
+		Layer inLayerBird = new Layer(config.PERCEPTRONSIZEBIRD, new NeuronProperties());
+		Neuron[] inArrayBird = inLayerBird.getNeurons();
+		
+		Layer percLayerPipes = new Layer(config.PERCEPTRONSIZEPIPE, np);
+		Neuron[] perceptronArrayPipes = percLayerPipes.getNeurons();
+		
+		Layer percLayerBird = new Layer(config.PERCEPTRONSIZEBIRD, new NeuronProperties());
+		Neuron[] perceptronArrayBird = percLayerBird.getNeurons();
+		
+		int genecount=0;
+		//input transfer to hidden layer
+		for(int i=0; i<config.PERCEPTRONSIZEBIRD; i++) {
+			ConnectionFactory.createConnection(inArrayBird[i], perceptronArrayBird[i],1);
+		}
+		for(int i=0; i<config.PERCEPTRONSIZEPIPE; i++) {
+			ConnectionFactory.createConnection(inArrayPipes[i], perceptronArrayPipes[i],1);
+		}
+		//hidden layer connections
+		for(int i=0; i<config.PERCEPTRONSIZEBIRD; i++) {
+			for(int j=0; j<config.PERCEPTRONSIZEPIPE; j++) {
+				ConnectionFactory.createConnection(perceptronArrayBird[i], perceptronArrayPipes[j]
+						,gene[genecount++]);
 			}
 		}
-		for(int i=0; i<config.HIDDENLAYERSIZE1; i++) {
-			for (int j = 0; j < config.HIDDENLAYERSIZE2; j++) {
-				ConnectionFactory.createConnection(hiddenLayer1.getNeuronAt(i), hiddenLayer2.getNeuronAt(j));
-			}
-		}
-		for(int i=0; i<config.HIDDENLAYERSIZE2; i++){
-			ConnectionFactory.createConnection(
-					hiddenLayer2.getNeuronAt(i),
-					outNeuron[0]);
+		
+		Layer outputLayer = new Layer(config.OUTPUTLAYERSIZE, new NeuronProperties());
+		Neuron[] outNeuron = outputLayer.getNeurons();
+		//hidden to output
+		for(int i=0; i<config.PERCEPTRONSIZEPIPE; i++) {
+			ConnectionFactory.createConnection(perceptronArrayPipes[i], outNeuron[0],gene[genecount++]);
 		}
 		nn = new NeuralNetwork<LearningRule>();
-		nn.addLayer(0, percLayer);
-		nn.addLayer(1, hiddenLayer1);
-		nn.addLayer(2, hiddenLayer2);
-		nn.addLayer(3, outputLayer);
+		
+		nn.addLayer(0, inLayerPipes);
+		nn.addLayer(1, inLayerBird);
+		nn.addLayer(2, percLayerBird);
+		nn.addLayer(3, percLayerPipes);
+		nn.addLayer(4, outputLayer);
 	}
 	
 	public void randomWeights(){
 		nn.randomizeWeights(minWeight, maxWeight);
 	}
 	
+	public void initIntWeights(){
+		double[] gene = new double[config.CONNECTIONCOUNT];
+		double x;
+		for (int i=0; i< config.CONNECTIONCOUNT ; i++){
+			gene[i] = config.random(0, 1);
+		}
+		initActivatorNetwork(gene);
+	}
+	
 	public Double[] getWeights(){
-		return nn.getWeights();
+		Double[] weights = new Double[config.CONNECTIONCOUNT];
+		int weightIterator= 0;
+		for (Neuron n : nn.getLayerAt(2).getNeurons()){
+			for(Connection c : n.getOutConnections())
+				weights[weightIterator++] = c.getWeight().getValue();
+		}
+		for (Neuron n : nn.getLayerAt(3).getNeurons()){
+			for(Connection c : n.getOutConnections())
+				weights[weightIterator++] = c.getWeight().getValue();
+		}
+		return weights;
 	}
 	
 	public NNetwork cross (NNetwork father){
@@ -174,7 +130,7 @@ public class NNetwork {
 		Double[] weights = new Double[motherWeights.length];
 		for (int i=0; i < motherWeights.length;i++)
 			weights[i] = crossMean(fatherWeights[i],motherWeights[i]);
-		child.init(ArrayUtils.toPrimitive(weights));
+		child.initActivatorNetwork(ArrayUtils.toPrimitive(weights));
 		return child;
 	}
 	
@@ -182,21 +138,34 @@ public class NNetwork {
 		return (father+mother)/2;
 	}
 	
-	public boolean decision(double[] data){
-		Neuron[] inputLayer = nn.getLayerAt(0).getNeurons();
+	public double decision(double[] data,double[] birdData){
+		Neuron[] birdInputLayer = nn.getLayerAt(1).getNeurons();
+		Neuron[] pipeInputLayer = nn.getLayerAt(0).getNeurons();
+	
 		for (int i=0;i<data.length;i++){
-			inputLayer[i].setInput(data[i]);
+			pipeInputLayer[i].setInput(data[i]);
 		}
+		for (int i=0;i<birdData.length;i++){
+			birdInputLayer[i].setInput(birdData[i]);
+		}
+		
+		
 		nn.calculate();
-		double ans = nn.getLayerAt(3).getNeuronAt(0).getOutput();
-		if (nn.getLayerAt(3).getNeuronAt(0).getOutput() > 0.5){
-			//System.out.println("JUMP - " + ans);
-			return true;
+		/*
+		for (int i=0; i < nn.getLayersCount() ; i++)
+			for (int j=0; j < nn.getLayerAt(i).getNeuronsCount() ; j++)
+				System.out.println("Layer "+i+"- neuron "+j+":"+nn.getLayerAt(i).getNeuronAt(j).getOutput());
+		System.out.println("==============================");
+		*/
+		double ans = nn.getLayerAt(nn.getLayersCount()-1).getNeuronAt(0).getOutput();
+		//System.out.println(ans);
+		if (ans >= 2){
+			jumpCount++;
 		}
 		else {
-			//System.out.println("DONT JUMP - " + ans);
-			return false;
+			noJump++;
 		}
+		return ans;
 	}
 
 }
